@@ -153,12 +153,12 @@ pub fn default_config<B: AutodiffBackend>(
     let mini_batch_size = 100_000;
     let gpu_timestep_buffer_size = batch_size;
     let truncation_value_batch_size = batch_size;
-    let lr = 1e-3;
+    let lr = 2e-4;
     let num_pools = 2;
 
     LearnerConfig {
         render: false,
-        render_game_id: 1,
+        render_game_id: 0,
         num_pools,
         num_threads_per_pool: available_parallelism().unwrap().get() / num_pools,
         num_games_per_pool: 512 / num_pools,
