@@ -1,0 +1,25 @@
+[package]
+name = "annie-train"
+version = "1.0.0"
+edition = "2024"
+
+[dependencies]
+burn = { version = "0.21.0", features = ["autodiff"] }
+rand = { workspace = true }
+rlgymppo = { path = "../rlgymppo", default-features = false }
+rlgymppo-utils = {path = "../rlgymppo-utils"}
+
+[features]
+default = ["wandb", "tui", "torch"]
+backend = []
+tui = ["rlgymppo/tui"]
+wandb = ["rlgymppo/wandb"]
+
+candle = ["backend", "burn/candle"]
+cuda = ["backend", "burn/cuda"]
+flex = ["backend", "burn/flex"]
+metal = ["backend", "burn/metal"]
+rocm = ["backend", "burn/rocm"]
+torch = ["backend", "burn/tch"]
+vulkan = ["backend", "burn/vulkan"]
+wgpu = ["backend", "burn/wgpu"]

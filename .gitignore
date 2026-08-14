@@ -1,7 +1,7 @@
 /target
 /venv
 /collision_meshes
-/checkpoints
+/checkpoints*
 rlviser*
 settings.txt
 Cargo.lock
