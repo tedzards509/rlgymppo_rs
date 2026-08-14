@@ -7,9 +7,9 @@ use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng, rng};
 use rlgymppo::rlgym::{Env, GameState, SharedInfoProvider};
 use rlgymppo::rocketsim::{Arena, ArenaEvent, CarBodyConfig, GameMode, Team, init_from_default};
-use rlgymppo::{any_terminal, combined_rewards, default_adamw_optimizer, weighted_state, GaeEstimator, LearnerConfig, NormSelection, PpoLearnerConfig, SelfPlayConfig, SkillTrackerConfig};
+use rlgymppo::{any_terminal, default_adamw_optimizer, weighted_state, GaeEstimator, LearnerConfig, PpoLearnerConfig, SelfPlayConfig, SkillTrackerConfig};
 use rlgymppo_utils::actions::DefaultAction;
-use rlgymppo_utils::obs::{AdvancedObs, DefaultObs};
+use rlgymppo_utils::obs::AdvancedObs;
 use rlgymppo_utils::shared_info::{SharedInfoReport, SharedInfoRng};
 use rlgymppo_utils::state_setters::{KickoffState, RandomState, WeightedState};
 use rlgymppo_utils::terminal::{
@@ -101,25 +101,40 @@ pub fn create_env(
 > {
     let game_id = game_id.unwrap_or(0);
 
+    let n_team_players = 1 + game_id % 3;
+
     let mut arena = Arena::new(GameMode::Soccar);
 
-    for _ in 0..=game_id % 3 {
+    for _ in 0..n_team_players {
         arena.add_car(Team::Blue, CarBodyConfig::OCTANE);
         arena.add_car(Team::Orange, CarBodyConfig::OCTANE);
     }
 
+    let state_setter = if n_team_players == 1 {
+        // 1s state (More kickoffs)
+        weighted_state![
+                KickoffState, 0.6;
+                RandomState<true, false, true>, 0.15;
+                RandomState<true, true, true>, 0.15;
+                RandomState<true, true, false>, 0.1;
+            ]
+    } else {
+        // 2s and 3s state
+        weighted_state![
+                KickoffState, 0.4;
+                RandomState<true, false, true>, 0.4;
+                RandomState<true, true, true>, 0.3;
+                RandomState<true, true, false>, 0.1;
+            ]
+    };
+
+
     Env::new(
         arena,
-        weighted_state![
-            // Tend to keep cars on the ground early
-            KickoffState, 0.3;
-            RandomState<true, false, true>, 0.3;
-            RandomState<true, true, true>, 0.3;
-            RandomState<true, true, false>, 0.1;
-        ],
+        state_setter,
         AdvancedObs,
         DefaultAction::default(),
-        rewards::RewardPresets::get_touch_ball_rewards(),
+        rewards::RewardPresets::get_scoring_rewards(),
         any_terminal![OnGoalCondition, GameEndCond],
         NoTouchCondition::default(),
         SharedInfo::default(),
@@ -149,7 +164,7 @@ pub fn default_config<B: AutodiffBackend>(
         num_games_per_pool: 512 / num_pools,
         timesteps_per_save: 100_000_000,
         checkpoints_limit: None,
-        checkpoints_folder: PathBuf::from("checkpoints-annie-v1"),
+        checkpoints_folder: PathBuf::from("checkpoints-annie-v0.3"),
         ppo: PpoLearnerConfig {
             gamma: 0.99,
             lambda: 0.95,
@@ -175,7 +190,7 @@ pub fn default_config<B: AutodiffBackend>(
         skill_tracker: SkillTrackerConfig {
             enabled: true,
             num_arenas: 12,
-            update_interval: 5_000_000/timesteps_per_iteration,
+            update_interval: 5_000_000 / timesteps_per_iteration,
             async_eval: async_skill_tracker,
             ..Default::default()
         },
@@ -315,7 +330,13 @@ fn main() {
         use burn::backend::wgpu::WgpuDevice;
         use rlgymppo::burn::backend::Autodiff;
 
-        run::<Autodiff<Metal>>(WgpuDevice::default(), WgpuDevice::default(), None, None, false);
+        run::<Autodiff<Metal>>(
+            WgpuDevice::default(),
+            WgpuDevice::default(),
+            None,
+            None,
+            false,
+        );
     }
 
     #[cfg(feature = "rocm")]

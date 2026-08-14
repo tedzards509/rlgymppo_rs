@@ -36,17 +36,16 @@ impl RewardPresets {
     /// Usually combined with a high learning rate
     pub fn get_scoring_rewards<SI>() -> CombinedRewards<SI>
     where
-        SI: rlgymppo_utils::shared_info::SharedInfoReport + 'static,
+        SI: rlgymppo_utils::shared_info::SharedInfoReport,
     {
         combined_rewards!(
-            "Reward/Learn touch ball", Self::get_touch_ball_rewards() => 1.0;
             "Reward/Goal", GoalReward::new(-0.2) => 10.0; // Barely punish getting scored on for now
             "Reward/Ball to goal", VelocityBallToGoalReward => 2.0;
-            "Reward/Touch ball", BallTouchReward => 1.0;
+            "Reward/Touch ball (hard)", StrongTouchReward::new(0.0, 3600.0) => 10.0; // Disincentivize dribbling again
             "Reward/Speed to ball", VelocityToBallReward => 1.0;
             "Reward/Face Ball", FaceBallReward => 0.1;
             "Reward/In Air", AirReward => 0.25;
-            "Reward/Player velocity", AnnieVelocityReward => 0.25; // Update to just use length of velocity / max speed
+            "Reward/Player velocity", AnnieVelocityReward => 0.25;
         )
     }
 }
