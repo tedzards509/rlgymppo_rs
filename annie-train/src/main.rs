@@ -164,7 +164,7 @@ pub fn default_config<B: AutodiffBackend>(
         num_games_per_pool: 512 / num_pools,
         timesteps_per_save: 100_000_000,
         checkpoints_limit: None,
-        checkpoints_folder: PathBuf::from("checkpoints-annie-v0.3"),
+        checkpoints_folder: PathBuf::from("runs/checkpoints-annie-v0.3"),
         ppo: PpoLearnerConfig {
             gamma: 0.99,
             lambda: 0.95,
@@ -205,6 +205,7 @@ pub fn default_config<B: AutodiffBackend>(
         wandb_project_name: Some("annie-v1".into()),
         #[cfg(feature = "wandb")]
         wandb_run_name: Some("annie-v1-0".into()),
+        metrics_jsonl_path: Some(PathBuf::from("runs/metrics-annie-v0.3.jsonl")),
         ..Default::default()
     }
 }
