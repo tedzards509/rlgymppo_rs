@@ -113,18 +113,18 @@ pub fn create_env(
     let state_setter = if n_team_players == 1 {
         // 1s state (More kickoffs)
         weighted_state![
-                KickoffState, 0.6;
+                KickoffState, 0.5;
                 RandomState<true, false, true>, 0.15;
                 RandomState<true, true, true>, 0.15;
-                RandomState<true, true, false>, 0.1;
+                RandomState<true, true, false>, 0.2;
             ]
     } else {
         // 2s and 3s state
         weighted_state![
-                KickoffState, 0.4;
+                KickoffState, 0.3;
                 RandomState<true, false, true>, 0.4;
                 RandomState<true, true, true>, 0.3;
-                RandomState<true, true, false>, 0.1;
+                RandomState<true, true, false>, 0.3;
             ]
     };
 
@@ -134,7 +134,7 @@ pub fn create_env(
         state_setter,
         AdvancedObs,
         DefaultAction::default(),
-        rewards::RewardPresets::get_scoring_rewards(),
+        rewards::RewardPresets::get_sparser_rewards_v0(),
         any_terminal![OnGoalCondition, GameEndCond],
         NoTouchCondition::default(),
         SharedInfo::default(),
@@ -158,7 +158,7 @@ pub fn default_config<B: AutodiffBackend>(
 
     LearnerConfig {
         render: false,
-        render_game_id: 0,
+        render_game_id: 2,
         num_pools,
         num_threads_per_pool: available_parallelism().unwrap().get() / num_pools,
         num_games_per_pool: 512 / num_pools,

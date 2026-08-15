@@ -76,6 +76,10 @@ pub struct AnnieNearbyTeammateReward {
 }
 
 impl AnnieNearbyTeammateReward {
+    pub fn new(max_distance: f32) -> Self {
+        AnnieNearbyTeammateReward { max_distance }
+    }
+
     fn get_reward(&self, info: &CarInfo, car: &CarState, cars: &Vec<(CarInfo, CarState)>) -> f32 {
         if car.is_demoed {
             return 0.0;
@@ -103,21 +107,38 @@ impl AnnieNearbyTeammateReward {
     }
 }
 
+impl<SI> Reward<SI> for AnnieNearbyTeammateReward {
+    fn reset(&mut self, _initial_state: &GameState, _shared_info: &mut SI) {}
+
+    fn get_rewards(&mut self, state: &GameState, _shared_info: &mut SI) -> Vec<f32> {
+        state
+            .cars
+            .iter()
+            .map(|(info, car)| self.get_reward(info, car, &state.cars))
+            .collect()
+    }
+}
+
 /// Reward used to punish being too far away from a teammate.
 ///
-/// Returns 0 if at least at most min_distance from all teammates.
+/// Returns 0 if at most min_distance from all teammates.
 #[derive(Default)]
 pub struct AnnieDistantTeammateReward {
     pub min_distance: f32,
+    pub ramp_up: f32
 }
 
 impl AnnieDistantTeammateReward {
+    pub fn new(min_distance: f32, ramp_up: f32) -> Self {
+        AnnieDistantTeammateReward { min_distance, ramp_up }
+    }
+
     fn get_reward(&self, info: &CarInfo, car: &CarState, cars: &Vec<(CarInfo, CarState)>) -> f32 {
         if car.is_demoed {
             return 0.0;
         }
 
-        let mut closest_proximity = f32::INFINITY;
+        let mut furthest_distance = -1f32;
         let mut num_teammates = 0;
 
         for (other_info, other_car) in cars {
@@ -126,16 +147,15 @@ impl AnnieDistantTeammateReward {
             }
 
             num_teammates += 1;
-            let dist = car.pos.distance(other_car.pos);
-            let proximity = 1.0 - dist / self.min_distance;
-            closest_proximity = closest_proximity.min(proximity);
+            let distance = (car.pos.distance(other_car.pos) - self.min_distance)/self.ramp_up;
+            furthest_distance = furthest_distance.max(distance);
         }
 
         if num_teammates == 0 {
             return 0.0;
         }
 
-        closest_proximity.clamp(0.0, 1.0)
+        furthest_distance.clamp(0.0, 1.0)
     }
 }
 
@@ -254,3 +274,5 @@ impl<SI> Reward<SI> for AnnieOffensivePositioningReward {
             .collect()
     }
 }
+
+// TODO: Tests
