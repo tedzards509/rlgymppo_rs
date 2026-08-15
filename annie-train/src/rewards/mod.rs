@@ -72,10 +72,10 @@ impl RewardPresets {
             "Reward/In Air", AirReward => 0.25;
             "Reward/Defensive positioning", AnnieDefensivePositioningReward::default() => 0.25;
             "Reward/Offensive positioning", AnnieOffensivePositioningReward::default() => 0.25;
-            "Reward/Nearby teammates", AnnieNearbyTeammateReward::new(3000.0) => -1.0;
-            "Reward/Distant teammates", AnnieDistantTeammateReward::new(6000.0, 3000.0) => -1.0; // from the teammate unless beneficial
+            "Reward/Nearby teammates", AnnieNearbyTeammateReward::new(2000.0) => -0.5;
+            "Reward/Distant teammates", AnnieDistantTeammateReward::new(7000.0, 3000.0) => -0.5;
             // NOTE: Replace with energy reward
-            "Reward/Player velocity", AnnieVelocityReward => 0.25;
+            "Reward/Player velocity", VelocityReward => 0.25;
         )
     }
 }
