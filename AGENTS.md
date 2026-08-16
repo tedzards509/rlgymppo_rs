@@ -10,17 +10,19 @@ written in [Burn](https://burn.dev) 0.21 instead of PyTorch.
 
 ## Workspace layout
 
-| Crate               | Purpose                                                                                                           |
-|---------------------|-------------------------------------------------------------------------------------------------------------------|
-| `annie-train`       | Main crate for training-specific code. Reference `annie-train/AGENTS.md` when writing training run specific code. |
-| `rlgymppo`          | Core PPO learner, multi-threaded environment runner, training loop.                                               |
-| `rlgymppo-model`    | Backend-generic policy/model definitions and checkpoint-compatible inference loading.                             |
-| `rlgymppo-rlbot`    | RLBot v5 agent that runs trained policies (Burn Flex + RocketSim state enrichment).                               |
-| `rlgymppo-utils`    | Reusable RLGym observation builders, action parsers, shared-info traits — no dependency on the learner.           |
-| `rlgymppo-tui`      | Terminal dashboard for live training metrics (ratatui).                                                           |
-| `rlgymppo-wandb`    | Weights & Biases integration via embedded Python (pyo3).                                                          |
-| `rlgymppo-trainer`  | Bundled training example (`examples/run.rs`) with self-play and skill tracking.                                   |
-| `rlgymppo-transfer` | Transfer-learning example (`examples/transfer_learn.rs`).                                                         |
+Nine crates, all Rust edition 2024:
+
+| Crate | Purpose |
+|---|---|
+| `rlgymppo` | Core PPO learner, multi-threaded environment runner, training loop. |
+| `rlgymppo-model` | Backend-generic policy/model definitions and checkpoint-compatible inference loading. |
+| `rlgymppo-nexto` | Nexto model inference, observation builder, action table, and pre-generated model weights. |
+| `rlgymppo-rlbot` | RLBot v5 agent that runs trained policies (Burn Flex + RocketSim state enrichment). |
+| `rlgymppo-utils` | Reusable RLGym observation builders, action parsers, shared-info traits — no dependency on the learner. |
+| `rlgymppo-tui` | Terminal dashboard for live training metrics (ratatui). |
+| `rlgymppo-wandb` | Weights & Biases integration via embedded Python (pyo3). |
+| `rlgymppo-trainer` | Bundled training example (`examples/run.rs`) with self-play and skill tracking. |
+| `rlgymppo-transfer` | Transfer-learning example (`examples/transfer_learn.rs`). |
 
 Key modules inside `rlgymppo`:
 
@@ -59,6 +61,10 @@ sharing data between components (RNG, per-tick metrics, episode state).
   (`DefaultAction<MAX_PLAYERS, TICK_SKIP, ACTION_DELAY>` — 90-entry discrete
   action table with validity masks), `shared_info.rs` (`SharedInfoRng`). The
   core crate re-exports these as `rlgymppo::utils::{obs, actions}`.
+- Nexto inference and its Rust observation/action functions live in
+  `rlgymppo-nexto`. The crate embeds pre-generated Burn model code and BurnPack
+  weights from `rlgymppo-nexto/nexto/`. Cargo does not run model conversion or
+  model code generation.
 - Trainer-side pieces go in `rlgymppo/src/utils/`: `rewards/`
   (`FaceBallReward`, `VelocityToBallReward`, `GoalReward`, `DemoReward`, …),
   `terminal/` (`OnGoalCondition`, `NoTouchCondition<MAX_TICKS>`,
@@ -115,8 +121,14 @@ Backends are mutually exclusive — enable **exactly one** feature: `torch`,
 - `Cargo.lock` is **gitignored** (not tracked) — do not try to commit it.
 - `rlgym` comes from a git branch (`native-rust`), and RocketSim is patched via
   `[patch."https://github.com/ZealanL/RocketSim.git"]` to the
- `fix-jump` branch —
-  keep the patch table intact.
+  `fix-jump` branch — keep the patch table intact.
+- `SkillTrackerConfig::default()` has `enabled: false` and
+  `nexto_mmr: Some(1500.0)`. Set `enabled` to `true` to run evaluations.
+  Enabled evaluations use randomly selected saved previous policy versions and
+  Nexto when configured. Old-version matches use two-sided Elo with saved
+  version ratings. Nexto is the only fixed bot; its MMR is configurable. Set
+  `nexto_mmr` to `None` to disable Nexto without loading its model. Set
+  `enabled` to `false` to disable all evaluations.
 - `rand` is 0.10 — note the newer API (e.g. `rand::seq::SliceRandom`,
   `Rng::random_range`).
 - Checkpoints are `NamedMpkGzFileRecorder` files (`actor.mpk.gz`, etc.) in
