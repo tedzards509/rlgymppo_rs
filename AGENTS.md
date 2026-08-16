@@ -4,33 +4,23 @@ Guidance for AI agents working in this repository.
 
 ## Project overview
 
-`rlgymppo-rs` is a Rust implementation of [GigaLearn](https://github.com/VirxEC/GigaLearn),
-a PPO trainer for Rocket League. It is built on RocketSim v3 + RLViser via
-RLGym-rs, with neural networks and training written in [Burn](https://burn.dev) 0.21
-instead of PyTorch.
-
-## Reference implementation
-
-The original C++ project lives in `GigaLearnCPP/` (a git submodule-style checkout
-of GigaLearn + RLGymCPP). It is **gitignored**, so search tools (`grep`, `find_path`)
-will not see it — use shell commands (`ls`, `cat`, `grep -r`, `find`) to consult it.
-The Rust code is a port; when behavior is ambiguous, check the C++ headers first
-(e.g. `GigaLearnCPP/src/public/GigaLearnCPP/LearnerConfig.h`).
+`rlgymppo-rs` is a Rust implementation of GigaLearn, a PPO trainer for Rocket League.
+It is built on RocketSim v3 + RLViser via RLGym-rs, with neural networks and training
+written in [Burn](https://burn.dev) 0.21 instead of PyTorch.
 
 ## Workspace layout
 
-Eight crates, all Rust edition 2024:
-
-| Crate | Purpose |
-|---|---|
-| `rlgymppo` | Core PPO learner, multi-threaded environment runner, training loop. |
-| `rlgymppo-model` | Backend-generic policy/model definitions and checkpoint-compatible inference loading. |
-| `rlgymppo-rlbot` | RLBot v5 agent that runs trained policies (Burn Flex + RocketSim state enrichment). |
-| `rlgymppo-utils` | Reusable RLGym observation builders, action parsers, shared-info traits — no dependency on the learner. |
-| `rlgymppo-tui` | Terminal dashboard for live training metrics (ratatui). |
-| `rlgymppo-wandb` | Weights & Biases integration via embedded Python (pyo3). |
-| `rlgymppo-trainer` | Bundled training example (`examples/run.rs`) with self-play and skill tracking. |
-| `rlgymppo-transfer` | Transfer-learning example (`examples/transfer_learn.rs`). |
+| Crate               | Purpose                                                                                                           |
+|---------------------|-------------------------------------------------------------------------------------------------------------------|
+| `annie-train`       | Main crate for training-specific code. Reference `annie-train/AGENTS.md` when writing training run specific code. |
+| `rlgymppo`          | Core PPO learner, multi-threaded environment runner, training loop.                                               |
+| `rlgymppo-model`    | Backend-generic policy/model definitions and checkpoint-compatible inference loading.                             |
+| `rlgymppo-rlbot`    | RLBot v5 agent that runs trained policies (Burn Flex + RocketSim state enrichment).                               |
+| `rlgymppo-utils`    | Reusable RLGym observation builders, action parsers, shared-info traits — no dependency on the learner.           |
+| `rlgymppo-tui`      | Terminal dashboard for live training metrics (ratatui).                                                           |
+| `rlgymppo-wandb`    | Weights & Biases integration via embedded Python (pyo3).                                                          |
+| `rlgymppo-trainer`  | Bundled training example (`examples/run.rs`) with self-play and skill tracking.                                   |
+| `rlgymppo-transfer` | Transfer-learning example (`examples/transfer_learn.rs`).                                                         |
 
 Key modules inside `rlgymppo`:
 
@@ -106,17 +96,6 @@ must stay in sync): `weighted_state![Type, weight; ...]`,
 
 Backends are mutually exclusive — enable **exactly one** feature: `torch`,
 `cuda`, `metal`, `rocm`, `wgpu`, `flex`, `candle`. `torch` is the most mature.
-
-```sh
-# train
-cargo run -p rlgymppo-trainer --example run --features torch
-
-# transfer-learn (distill rlgymppo-trainer's model into a smaller student)
-cargo run -p rlgymppo-transfer --example transfer_learn --features torch
-```
-
-`rlgymppo` defaults to `tui` + `wandb`; the trainer crate defaults to
-`wandb` + `tui` + `torch`.
 
 ### Environment prerequisites
 

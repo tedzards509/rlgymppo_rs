@@ -41,8 +41,16 @@ complete training example. The core logic lives in
 
 Run with your chosen backend (replace `torch` with `cuda`, `wgpu`, `metal`, etc.):
 
+torch:
+Download libtorch.
+Then, point to that installation using the LIBTORCH and LD_LIBRARY_PATH environment variables before building burn-tch or a crate which depends on it.
 ```sh
-cargo run -p rlgymppo-trainer --example run --features torch
+export LIBTORCH=/absolute/path/to/libtorch/
+export LD_LIBRARY_PATH=/absolute/path/to/libtorch/lib:$LD_LIBRARY_PATH
+```
+
+```sh
+cargo run -p rlgymppo-trainer --example run --no-default-features --features torch,tui
 ```
 
 At a high level, training looks like this:

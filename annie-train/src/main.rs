@@ -155,13 +155,15 @@ pub fn default_config<B: AutodiffBackend>(
     let lr = 1e-4;
     let num_pools = 2;
 
+    let rating_update_ts = 5_000_000;
+
     LearnerConfig {
         render: false,
         render_game_id: 1,
         num_pools,
         num_threads_per_pool: available_parallelism().unwrap().get() / num_pools,
         num_games_per_pool: 512 / num_pools,
-        timesteps_per_save: 100_000_000,
+        timesteps_per_save: 25_000_000,
         checkpoints_limit: None,
         checkpoints_folder: PathBuf::from("runs/checkpoints-annie-v0.3"),
         ppo: PpoLearnerConfig {
@@ -189,7 +191,7 @@ pub fn default_config<B: AutodiffBackend>(
         skill_tracker: SkillTrackerConfig {
             enabled: true,
             num_arenas: 12,
-            update_interval: 5_000_000 / timesteps_per_iteration,
+            update_interval: rating_update_ts / timesteps_per_iteration,
             async_eval: async_skill_tracker,
             ..Default::default()
         },

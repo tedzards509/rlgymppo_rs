@@ -2,6 +2,7 @@
 /venv
 /collision_meshes
 /checkpoints*
+/runs
 rlviser*
 settings.txt
 Cargo.lock
@@ -10,3 +11,5 @@ perf.data*
 gpucore*
 /wandb
 /GigaLearnCPP
+/guides
+/.idea
