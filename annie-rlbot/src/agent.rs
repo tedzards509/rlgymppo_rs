@@ -47,7 +47,7 @@ pub trait RlbotAction {
 }
 
 impl<const MAX_PLAYERS: usize, const TICK_SKIP: u8, const ACTION_DELAY: u8> RlbotAction
-for DefaultAction<MAX_PLAYERS, TICK_SKIP, ACTION_DELAY>
+    for DefaultAction<MAX_PLAYERS, TICK_SKIP, ACTION_DELAY>
 {
     fn get_action(&self, action_index: usize) -> CarControls {
         self.get_action(action_index)
@@ -100,12 +100,12 @@ where
             ),
             &device,
         )
-            .unwrap_or_else(|error| {
-                panic!(
-                    "load policy checkpoint from {}: {error}",
-                    checkpoint.display()
-                )
-            });
+        .unwrap_or_else(|error| {
+            panic!(
+                "load policy checkpoint from {}: {error}",
+                checkpoint.display()
+            )
+        });
 
         Self {
             player_index: controllable_info.index as usize,
@@ -131,8 +131,8 @@ where
             )
             && packet.players.get(self.player_index).is_some()
             && self
-            .next_decision_frame
-            .is_none_or(|next_frame| frame >= next_frame)
+                .next_decision_frame
+                .is_none_or(|next_frame| frame >= next_frame)
         {
             self.infer(frame);
         }

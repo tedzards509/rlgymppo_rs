@@ -3,7 +3,6 @@ mod controls;
 mod state;
 
 use agent::{ConfigurablePpoBot, PpoBotConfig};
-
 use rand::SeedableRng;
 use rand::rngs::SmallRng;
 use rlbot_rocketsim::rlbot::RLBotConnection;
@@ -11,7 +10,7 @@ use rlbot_rocketsim::rlbot::agents::run_bot_agents;
 use rlbot_rocketsim::rlbot::util::AgentEnvironment;
 use rlgymppo_model::{NormSelection, PolicyConfig};
 use rlgymppo_utils::actions::DefaultAction;
-use rlgymppo_utils::obs::{AdvancedObs};
+use rlgymppo_utils::obs::AdvancedObs;
 use rlgymppo_utils::rocketsim::{GameMode, init_from_mem};
 use rlgymppo_utils::shared_info::SharedInfoRng;
 use rustc_hash::FxHashMap;
@@ -51,7 +50,6 @@ impl PpoBotConfig for AnnieV0_3Config {
         }
     }
 }
-
 
 // Configure the shared info, observation builder, discrete action parser, and policy architecture.
 type Bot = ConfigurablePpoBot<AdvancedObs<3>, DefaultAction<6, 8, 1>, SharedInfo, AnnieV0_3Config>;

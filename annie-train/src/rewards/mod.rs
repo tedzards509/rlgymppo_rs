@@ -1,13 +1,16 @@
 #![allow(unused_imports)]
+use player_rewards::{
+    AnnieDefensivePositioningReward, AnnieOffensivePositioningReward, AnnieVelocityReward,
+};
 use rlgymppo_utils::combined_rewards;
 use rlgymppo_utils::rewards::{
-    AirReward, BallTouchReward, BumpReward, BumpedPenalty, DemoReward,
-    DemoedPenalty, FaceBallReward, GoalReward, PickupBoostReward, SaveBoostReward,
-    StrongTouchReward, TouchAccelReward, VelocityBallToGoalReward, VelocityReward,
-    VelocityToBallReward, WavedashReward
+    AirReward, BallTouchReward, BumpReward, BumpedPenalty, DemoReward, DemoedPenalty,
+    FaceBallReward, GoalReward, PickupBoostReward, SaveBoostReward, StrongTouchReward,
+    TouchAccelReward, VelocityBallToGoalReward, VelocityReward, VelocityToBallReward,
+    WavedashReward,
 };
 pub use rlgymppo_utils::rewards::{CombinedRewards, ZeroSumReward};
-use player_rewards::{AnnieVelocityReward, AnnieDefensivePositioningReward, AnnieOffensivePositioningReward};
+
 use crate::rewards::player_rewards::{AnnieDistantTeammateReward, AnnieNearbyTeammateReward};
 
 mod player_rewards;

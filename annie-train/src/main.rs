@@ -2,12 +2,16 @@
 
 use std::path::PathBuf;
 use std::thread::available_parallelism;
+
 use burn::tensor::backend::AutodiffBackend;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng, rng};
 use rlgymppo::rlgym::{Env, GameState, SharedInfoProvider};
 use rlgymppo::rocketsim::{Arena, ArenaEvent, CarBodyConfig, GameMode, Team, init_from_default};
-use rlgymppo::{any_terminal, default_adamw_optimizer, weighted_state, GaeEstimator, LearnerConfig, PpoLearnerConfig, SelfPlayConfig, SkillTrackerConfig};
+use rlgymppo::{
+    GaeEstimator, LearnerConfig, PpoLearnerConfig, SelfPlayConfig, SkillTrackerConfig,
+    any_terminal, default_adamw_optimizer, weighted_state,
+};
 use rlgymppo_utils::actions::DefaultAction;
 use rlgymppo_utils::obs::AdvancedObs;
 use rlgymppo_utils::shared_info::{SharedInfoReport, SharedInfoRng};
@@ -326,12 +330,7 @@ fn main() {
         use burn::backend::wgpu::WgpuDevice;
         use rlgymppo::burn::backend::Autodiff;
 
-        run::<Autodiff<Metal>>(
-            WgpuDevice::default(),
-            WgpuDevice::default(),
-            None,
-            false,
-        );
+        run::<Autodiff<Metal>>(WgpuDevice::default(), WgpuDevice::default(), None, false);
     }
 
     #[cfg(feature = "rocm")]

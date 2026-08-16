@@ -779,7 +779,12 @@ impl<B: AutodiffBackend> LearnerConfig<B> {
             let renderer_controls = renderer_controls.clone();
 
             thread::spawn(move || {
-                Renderer::new((create_env)(Some(self.render_game_id)), renderer_controls, self.render_device).run();
+                Renderer::new(
+                    (create_env)(Some(self.render_game_id)),
+                    renderer_controls,
+                    self.render_device,
+                )
+                .run();
             })
         };
 

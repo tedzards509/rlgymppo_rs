@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use rlgymppo::rlgym::{GameState, Reward};
 use rlgymppo::rocketsim::shared::Aabb;
-use rlgymppo::rocketsim::{consts, BallState, CarInfo, CarState, GameMode, Team};
+use rlgymppo::rocketsim::{BallState, CarInfo, CarState, GameMode, Team, consts};
 /*
 # Brainstorm:
 - Control
@@ -36,7 +36,7 @@ fn danger_to_goal(team: Team, ball: BallState, exponent: Option<f32>) -> f32 {
     // Normalized distance: +1.0 at the teams goal center, -1.0 at the opponents
     let norm_dist_to_goal = 1.0 - (dist_to_goal / aabb.max.y).min(2.0);
 
-    1.0 / (1.0 + (- exponent * norm_dist_to_goal).exp())
+    1.0 / (1.0 + (-exponent * norm_dist_to_goal).exp())
 }
 
 /// Reward for general velocity.
@@ -125,12 +125,15 @@ impl<SI> Reward<SI> for AnnieNearbyTeammateReward {
 #[derive(Default)]
 pub struct AnnieDistantTeammateReward {
     pub min_distance: f32,
-    pub ramp_up: f32
+    pub ramp_up: f32,
 }
 
 impl AnnieDistantTeammateReward {
     pub fn new(min_distance: f32, ramp_up: f32) -> Self {
-        AnnieDistantTeammateReward { min_distance, ramp_up }
+        AnnieDistantTeammateReward {
+            min_distance,
+            ramp_up,
+        }
     }
 
     fn get_reward(&self, info: &CarInfo, car: &CarState, cars: &Vec<(CarInfo, CarState)>) -> f32 {
@@ -147,7 +150,7 @@ impl AnnieDistantTeammateReward {
             }
 
             num_teammates += 1;
-            let distance = (car.pos.distance(other_car.pos) - self.min_distance)/self.ramp_up;
+            let distance = (car.pos.distance(other_car.pos) - self.min_distance) / self.ramp_up;
             furthest_distance = furthest_distance.max(distance);
         }
 
