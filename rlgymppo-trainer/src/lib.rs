@@ -133,7 +133,6 @@ pub fn create_env(
 pub fn default_config<B: AutodiffBackend>(
     device: B::Device,
     render_device: B::Device,
-    pipelined_collection_device: Option<B::Device>,
     skill_tracker_device: Option<B::Device>,
     async_skill_tracker: bool,
 ) -> LearnerConfig<B> {
@@ -160,7 +159,6 @@ pub fn default_config<B: AutodiffBackend>(
         num_games_per_pool: 512 / num_pools,
         timesteps_per_save: 100_000_000,
         checkpoints_limit: None,
-        pipelined_collection_device,
         ppo: PpoLearnerConfig {
             timesteps_per_iteration,
             batch_size,
@@ -206,7 +204,6 @@ pub fn default_config<B: AutodiffBackend>(
 pub fn run<B: AutodiffBackend>(
     device: B::Device,
     render_device: B::Device,
-    pipelined_collection_device: Option<B::Device>,
     skill_tracker_device: Option<B::Device>,
     async_skill_tracker: bool,
 ) {
@@ -215,7 +212,6 @@ pub fn run<B: AutodiffBackend>(
     let mut learner = default_config::<B>(
         device,
         render_device,
-        pipelined_collection_device,
         skill_tracker_device,
         async_skill_tracker,
     )

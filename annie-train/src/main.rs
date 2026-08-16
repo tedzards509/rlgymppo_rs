@@ -143,7 +143,6 @@ pub fn create_env(
 pub fn default_config<B: AutodiffBackend>(
     device: B::Device,
     render_device: B::Device,
-    pipelined_collection_device: Option<B::Device>,
     skill_tracker_device: Option<B::Device>,
     async_skill_tracker: bool,
 ) -> LearnerConfig<B> {
@@ -201,7 +200,6 @@ pub fn default_config<B: AutodiffBackend>(
         device,
         render_device,
         skill_tracker_device,
-        pipelined_collection_device,
         #[cfg(feature = "wandb")]
         wandb_project_name: Some("annie-v1".into()),
         #[cfg(feature = "wandb")]
@@ -214,7 +212,6 @@ pub fn default_config<B: AutodiffBackend>(
 pub fn run<B: AutodiffBackend>(
     device: B::Device,
     render_device: B::Device,
-    pipelined_collection_device: Option<B::Device>,
     skill_tracker_device: Option<B::Device>,
     async_skill_tracker: bool,
 ) {
@@ -223,7 +220,6 @@ pub fn run<B: AutodiffBackend>(
     let mut learner = default_config::<B>(
         device,
         render_device,
-        pipelined_collection_device,
         skill_tracker_device,
         async_skill_tracker,
     )
@@ -310,8 +306,6 @@ fn main() {
         run::<Autodiff<LibTorch>>(
             LibTorchDevice::Cuda(0),
             LibTorchDevice::Cpu,
-            None,
-            //Some(LibTorchDevice::Cuda(0)),
             Some(LibTorchDevice::Cpu),
             true,
         );
@@ -336,7 +330,6 @@ fn main() {
             WgpuDevice::default(),
             WgpuDevice::default(),
             None,
-            None,
             false,
         );
     }
@@ -359,7 +352,6 @@ fn main() {
         run::<Autodiff<Wgpu>>(
             WgpuDevice::default(),
             WgpuDevice::default(),
-            None,
             Some(WgpuDevice::Cpu),
             true,
         );
@@ -370,7 +362,7 @@ fn main() {
         use burn::backend::Flex;
         use rlgymppo::burn::backend::Autodiff;
 
-        run::<Autodiff<Flex>>(Default::default(), Default::default(), None, None, true);
+        run::<Autodiff<Flex>>(Default::default(), Default::default(), None, true);
     }
 
     #[cfg(feature = "candle")]
@@ -382,7 +374,6 @@ fn main() {
         run::<Autodiff<Candle>>(
             CandleDevice::default(),
             CandleDevice::default(),
-            None,
             Some(CandleDevice::Cpu),
             true,
         );
